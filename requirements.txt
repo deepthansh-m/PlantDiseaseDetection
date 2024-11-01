@@ -1,0 +1,6 @@
+Flask
+Flask-SocketIO
+tensorflow
+pillow
+googletrans==4.0.0-rc1
+gTTS

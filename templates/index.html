@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center">Plant Disease Detector</h2>
+    <div class="form-group text-center">
+        <input type="file" id="imageUpload" accept="image/*" onchange="previewImage()">
+        <div class="image-preview" id="imagePreview">
+            <img id="previewImg" src="" alt="Image Preview">
+        </div>
+        <button class="btn btn-primary mt-3" onclick="predictDisease()">Predict Disease</button>
+    </div>
+    <div id="predictionResult" class="text-center mt-3"></div>
+    <div class="form-group text-center mt-4">
+        <label for="languageSelect">Select Language</label>
+        <select id="languageSelect" class="form-control" onchange="translateText()">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="bn">Bengali</option>
+            <option value="te">Telugu</option>
+            <option value="ta">Tamil</option>
+            <option value="mr">Marathi</option>
+            <option value="gu">Gujarati</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="or">Odia</option>
+            <option value="pa">Punjabi</option>
+            <option value="as">Assamese</option>
+            <option value="ur">Urdu</option>
+            <option value="ne">Nepali</option>
+            <option value="si">Sinhalese</option>
+            <option value="bh">Bhojpuri</option>
+            <option value="ma">Magahi</option>
+            <option value="bo">Bodo</option>
+            <option value="rj">Rajasthani</option>
+            <option value="ks">Kashmiri</option>
+            <option value="san">Sanskrit</option>
+        </select>
+        <button class="btn btn-secondary mt-2" onclick="textToSpeech()">Listen</button>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+    function previewImage() {
+        const file = document.getElementById('imageUpload').files[0];
+        const previewImg = document.getElementById('previewImg');
+        const imagePreview = document.getElementById('imagePreview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result; // Set the source of the image
+                imagePreview.style.display = 'block'; // Show the image preview
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.style.display = 'none'; // Hide the preview if no file is selected
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+            .then(() => console.log("Service Worker registered"))
+            .catch(error => console.log("Service Worker registration failed:", error));
+    }
+</script>
+</body>
+</html>
