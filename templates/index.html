@@ -9,41 +9,42 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="text-center">Plant Disease Detector</h2>
+    <h2 class="text-center translatable">Plant Disease Detector</h2>
     <div class="form-group text-center">
         <input type="file" id="imageUpload" accept="image/*" onchange="previewImage()">
         <div class="image-preview" id="imagePreview">
             <img id="previewImg" src="" alt="Image Preview">
         </div>
-        <button class="btn btn-primary mt-3" onclick="predictDisease()">Predict Disease</button>
+        <button class="btn btn-primary mt-3 translatable" onclick="predictDisease()">Analyse Disease</button>
     </div>
-    <div id="predictionResult" class="text-center mt-3"></div>
+    <div id="predictionResult" class="text-center mt-3 translatable"></div>
     <div class="form-group text-center mt-4">
-        <label for="languageSelect">Select Language</label>
+        <button id="solutionButton" style="display: none;" class="translatable">View Solution</button>
+        <label for="languageSelect" class="translatable">Select Language</label>
         <select id="languageSelect" class="form-control" onchange="translateText()">
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-            <option value="bn">Bengali</option>
-            <option value="te">Telugu</option>
-            <option value="ta">Tamil</option>
-            <option value="mr">Marathi</option>
-            <option value="gu">Gujarati</option>
-            <option value="kn">Kannada</option>
-            <option value="ml">Malayalam</option>
-            <option value="or">Odia</option>
-            <option value="pa">Punjabi</option>
-            <option value="as">Assamese</option>
-            <option value="ur">Urdu</option>
-            <option value="ne">Nepali</option>
-            <option value="si">Sinhalese</option>
-            <option value="bh">Bhojpuri</option>
-            <option value="ma">Magahi</option>
-            <option value="bo">Bodo</option>
-            <option value="rj">Rajasthani</option>
-            <option value="ks">Kashmiri</option>
-            <option value="san">Sanskrit</option>
+            <option value="en" class="translatable">English</option>
+            <option value="hi" class="translatable">Hindi</option>
+            <option value="bn" class="translatable">Bengali</option>
+            <option value="te" class="translatable">Telugu</option>
+            <option value="ta" class="translatable">Tamil</option>
+            <option value="mr" class="translatable">Marathi</option>
+            <option value="gu" class="translatable">Gujarati</option>
+            <option value="kn" class="translatable">Kannada</option>
+            <option value="ml" class="translatable">Malayalam</option>
+            <option value="or" class="translatable">Odia</option>
+            <option value="pa" class="translatable">Punjabi</option>
+            <option value="as" class="translatable">Assamese</option>
+            <option value="ur" class="translatable">Urdu</option>
+            <option value="ne" class="translatable">Nepali</option>
+            <option value="si" class="translatable">Sinhalese</option>
+            <option value="bh" class="translatable">Bhojpuri</option>
+            <option value="ma" class="translatable">Magahi</option>
+            <option value="bo" class="translatable">Bodo</option>
+            <option value="rj" class="translatable">Rajasthani</option>
+            <option value="ks" class="translatable">Kashmiri</option>
+            <option value="san" class="translatable">Sanskrit</option>
         </select>
-        <button class="btn btn-secondary mt-2" onclick="textToSpeech()">Listen</button>
+        <button class="btn btn-secondary mt-2  translatable" onclick="textToSpeech()">Listen</button>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
@@ -64,7 +65,12 @@
             imagePreview.style.display = 'none'; // Hide the preview if no file is selected
         }
     }
-
+    function viewSolution() {
+        const disease = sessionStorage.getItem('disease');
+        if (disease) {
+            window.location.href = `/solution/${disease}`;
+        }
+    }
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
             .then(() => console.log("Service Worker registered"))

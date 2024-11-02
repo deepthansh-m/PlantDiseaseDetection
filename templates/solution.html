@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solution for {{ disease_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 id="disease-heading" class="translatable">Solution for {{ disease_name }}</h1>
+        <p id="disease-description" class="translatable">
+            Here are the recommended treatment and preventive measures for <strong>{{ disease_name.replace('_', ' ') }}</strong>.
+        </p>
+
+        <div class="solution-details translatable">
+            <h2>Solution Details</h2>
+            <p>{{ solution }}</p>
+        </div>
+
+        <h2 class="translatable">Pesticides</h2>
+        <ul class="translatable">
+            {% for pesticide in pesticides %}
+                <li>{{ pesticide }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="translatable">Fertilizers</h2>
+        <ul class="translatable">
+            {% for fertilizer in fertilizers %}
+                <li>{{ fertilizer }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="form-group text-center mt-4">
+            <label for="languageSelect" class="translatable">Select Language:</label>
+            <select id="languageSelect" class="form-control" onchange="translateText()">
+                <option value="en" class="translatable">English</option>
+                <option value="hi" class="translatable">Hindi</option>
+                <option value="bn" class="translatable">Bengali</option>
+                <option value="te" class="translatable">Telugu</option>
+                <option value="ta" class="translatable">Tamil</option>
+                <option value="mr" class="translatable">Marathi</option>
+                <option value="gu" class="translatable">Gujarati</option>
+                <option value="kn" class="translatable">Kannada</option>
+                <option value="ml" class="translatable">Malayalam</option>
+                <option value="or" class="translatable">Odia</option>
+                <option value="pa" class="translatable">Punjabi</option>
+                <option value="as" class="translatable">Assamese</option>
+                <option value="ur" class="translatable">Urdu</option>
+                <option value="ne" class="translatable">Nepali</option>
+                <option value="si" class="translatable">Sinhalese</option>
+                <option value="bh" class="translatable">Bhojpuri</option>
+                <option value="ma" class="translatable">Magahi</option>
+                <option value="bo" class="translatable">Bodo</option>
+                <option value="rj" class="translatable">Rajasthani</option>
+                <option value="ks" class="translatable">Kashmiri</option>
+                <option value="san" class="translatable">Sanskrit</option>
+            </select>
+            <button class="btn btn-secondary mt-2 translatable" onclick="textToSpeech()">Listen</button>
+        </div>
+
+        <!-- PDF Download Option -->
+        <div class="download-section">
+            <a href="{{ url_for('download_solution', disease_name=disease_name) }}" class="download-button">Download Solution PDF</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+            .then(() => console.log("Service Worker registered"))
+            .catch(error => console.log("Service Worker registration failed:", error));
+    }
+    </script>
+</body>
+</html>
