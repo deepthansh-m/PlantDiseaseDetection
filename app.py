@@ -63,7 +63,7 @@ def index():
 def predict():
     file = request.files['file']
     if file:
-        img = Image.open(file).resize((256, 256))
+        img = Image.open(file).resize((64, 64))
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 

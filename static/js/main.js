@@ -34,20 +34,32 @@ function translateText() {
     const translatableElements = document.querySelectorAll('.translatable');
     const lang = document.getElementById('languageSelect').value;
 
-    // Collect the text to translate after defining the array
-    const textArray = Array.from(translatableElements).map(element => element.innerText);
+    // Collect the text to translate while keeping track of the original index
+    const textArray = Array.from(translatableElements).map(element => element.innerText.trim());
+
+    // Create an array to hold the original indices for translating back
+    const indicesToTranslate = textArray.map((text, index) => text !== '' ? index : null).filter(index => index !== null);
+
+    // Log the texts to be translated for debugging
     console.log("Translating text:", textArray, "to language:", lang);
+
+    // Check if there are any texts to translate
+    if (indicesToTranslate.length === 0) {
+        console.warn('No text available for translation.');
+        return;
+    }
 
     fetch('/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: textArray, lang })
+        body: JSON.stringify({ text: textArray.filter(text => text !== ''), lang })
     })
     .then(response => response.json())
     .then(data => {
-        if (data.translated_texts && data.translated_texts.length === textArray.length) {
-            translatableElements.forEach((element, index) => {
-                element.innerText = data.translated_texts[index];
+        if (data.translated_texts && data.translated_texts.length === indicesToTranslate.length) {
+            // Update the elements based on their original indices
+            indicesToTranslate.forEach((originalIndex, translatedIndex) => {
+                translatableElements[originalIndex].innerText = data.translated_texts[translatedIndex] || ''; // Maintain null/empty where applicable
             });
         } else {
             console.error('Translation response error:', data);
