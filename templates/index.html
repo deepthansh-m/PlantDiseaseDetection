@@ -57,12 +57,12 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                previewImg.src = e.target.result; // Set the source of the image
-                imagePreview.style.display = 'block'; // Show the image preview
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
             }
             reader.readAsDataURL(file);
         } else {
-            imagePreview.style.display = 'none'; // Hide the preview if no file is selected
+            imagePreview.style.display = 'none';
         }
     }
     function viewSolution() {

@@ -296,13 +296,11 @@ def download_solution(disease_name):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    # Retrieve solution details
     solution_info = disease_solutions.get(disease_name, {})
     solution = solution_info.get("solution", "No solution available.")
     pesticides = solution_info.get("pesticides", [])
     fertilizers = solution_info.get("fertilizers", [])
 
-    # Add content to the PDF
     pdf.cell(200, 10, txt=f"Solution for {disease_name}", ln=True, align='C')
     pdf.ln(10)
     pdf.multi_cell(0, 10, f"Solution: {solution}")
@@ -317,7 +315,6 @@ def download_solution(disease_name):
     for fertilizer in fertilizers:
         pdf.cell(200, 10, txt=f"- {fertilizer}", ln=True)
 
-    # Save the PDF to a temporary file
     pdf_file_path = f"solutions/{disease_name}.pdf"
     pdf.output(pdf_file_path)
 
@@ -327,7 +324,7 @@ def download_solution(disease_name):
 def translate():
     data = request.json
     print(data)
-    texts = data.get('text')  # Ensure you use 'text' not 'texts'
+    texts = data.get('text')
     target_language = data.get('lang')
 
     if texts and isinstance(texts, list) and all(isinstance(text, str) for text in texts) and target_language:
