@@ -6,6 +6,7 @@ from googletrans import Translator
 from gtts import gTTS
 from flask import Flask, send_file
 from fpdf import FPDF
+from langcodes import Language
 import os
 
 app = Flask(__name__)
@@ -291,7 +292,7 @@ def solution(disease_name):
 
 @app.route('/download_solution/<disease_name>')
 def download_solution(disease_name):
-    # Create the PDF document
+    os.makedirs('solutions', exist_ok=True)
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -323,11 +324,13 @@ def download_solution(disease_name):
 @app.route('/translate', methods=['POST'])
 def translate():
     data = request.json
-    print(data)
     texts = data.get('text')
     target_language = data.get('lang')
 
     if texts and isinstance(texts, list) and all(isinstance(text, str) for text in texts) and target_language:
+        if not Language.make(target_language).is_valid():
+            return jsonify({'error': 'Invalid language code provided.'})
+
         try:
             translations = [translator.translate(text, dest=target_language).text for text in texts]
             return jsonify({'translated_texts': translations})

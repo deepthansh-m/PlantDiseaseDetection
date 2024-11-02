@@ -34,9 +34,9 @@ function translateText() {
     const translatableElements = document.querySelectorAll('.translatable');
     const lang = document.getElementById('languageSelect').value;
 
-    console.log("Translating text:", textArray, "to language:", lang);
-
+    // Collect the text to translate after defining the array
     const textArray = Array.from(translatableElements).map(element => element.innerText);
+    console.log("Translating text:", textArray, "to language:", lang);
 
     fetch('/translate', {
         method: 'POST',

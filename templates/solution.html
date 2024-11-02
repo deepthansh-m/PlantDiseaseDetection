@@ -9,62 +9,58 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="disease-heading" class="translatable">Solution for {{ disease_name }}</h1>
+        <h1 id="disease-heading" class="translatable">Solution for {{ disease_name.replace('_', ' ') }}</h1>
         <p id="disease-description" class="translatable">
             Here are the recommended treatment and preventive measures for <strong>{{ disease_name.replace('_', ' ') }}</strong>.
         </p>
 
         <div class="card">
-          <div class="card-header">
-            Solution Details
-              <p class="card-text">{{ solution }}</p>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">Pesticides</h5>
-            <p class="card-text">
-              <ul class="translatable">
+            <div class="card-header translatable">
+                Solution Details
+            </div>
+            <div class="card-body">
+                <p class="card-text translatable" id="solution">{{ solution }}</p>
+                <h5 class="card-title translatable" id="pesticides_text">The recommended Pesticides are:</h5>
+                <ul class="translatable" id="pesticide">
                     {% for pesticide in pesticides %}
                         <li>{{ pesticide }}</li>
                     {% endfor %}
                 </ul>
-              </p>
-            <h5 class="card-title">Fertilizers</h5>
-            <p class="card-text">
-              <ul class="translatable">
+                <h5 class="card-title translatable"id="fertilizers_text">The recommended Fertilizers are:</h5>
+                <ul class="translatable" id="fertilizers">
                     {% for fertilizer in fertilizers %}
                         <li>{{ fertilizer }}</li>
                     {% endfor %}
                 </ul>
-              </p>
-          </div>
+            </div>
         </div>
 
         <div class="form-group text-center mt-4">
             <label for="languageSelect" class="translatable">Select Language:</label>
             <select id="languageSelect" class="form-control" onchange="translateText()">
-                <option value="en" class="translatable">English</option>
-                <option value="hi" class="translatable">Hindi</option>
-                <option value="bn" class="translatable">Bengali</option>
-                <option value="te" class="translatable">Telugu</option>
-                <option value="ta" class="translatable">Tamil</option>
-                <option value="mr" class="translatable">Marathi</option>
-                <option value="gu" class="translatable">Gujarati</option>
-                <option value="kn" class="translatable">Kannada</option>
-                <option value="ml" class="translatable">Malayalam</option>
-                <option value="or" class="translatable">Odia</option>
-                <option value="pa" class="translatable">Punjabi</option>
-                <option value="as" class="translatable">Assamese</option>
-                <option value="ur" class="translatable">Urdu</option>
-                <option value="ne" class="translatable">Nepali</option>
-                <option value="si" class="translatable">Sinhalese</option>
-                <option value="bh" class="translatable">Bhojpuri</option>
-                <option value="ma" class="translatable">Magahi</option>
-                <option value="bo" class="translatable">Bodo</option>
-                <option value="rj" class="translatable">Rajasthani</option>
-                <option value="ks" class="translatable">Kashmiri</option>
-                <option value="san" class="translatable">Sanskrit</option>
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="bn">Bengali</option>
+                <option value="te">Telugu</option>
+                <option value="ta">Tamil</option>
+                <option value="mr">Marathi</option>
+                <option value="gu">Gujarati</option>
+                <option value="kn">Kannada</option>
+                <option value="ml">Malayalam</option>
+                <option value="or">Odia</option>
+                <option value="pa">Punjabi</option>
+                <option value="as">Assamese</option>
+                <option value="ur">Urdu</option>
+                <option value="ne">Nepali</option>
+                <option value="si">Sinhalese</option>
+                <option value="bh">Bhojpuri</option>
+                <option value="ma">Magahi</option>
+                <option value="bo">Bodo</option>
+                <option value="rj">Rajasthani</option>
+                <option value="ks">Kashmiri</option>
+                <option value="san">Sanskrit</option>
             </select>
-            <button class="btn btn-secondary mt-2 translatable" onclick="textToSpeech()">Listen</button>
+            <button class="btn btn-secondary mt-2 translatable" onclick="textToSpeech1()">Listen</button>
         </div>
 
         <div class="download-section">
@@ -72,35 +68,100 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        function previewImage() {
-        const file = document.getElementById('imageUpload').files[0];
-        const previewImg = document.getElementById('previewImg');
-        const imagePreview = document.getElementById('imagePreview');
+        function textToSpeech1() {
+            const diseasedisc = document.getElementById('disease-description').innerText;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            const solutionText = document.getElementById('solution').innerText;
+            const pesticideList = document.getElementById('pesticides_text').innerText;
+            const fertilizerList = document.getElementById('fertilizers_text').innerText;
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                imagePreview.style.display = 'block';
+            const pesticides = document.getElementById('pesticide').innerText;
+            const fertilizers = document.getElementById('fertilizers').innerText;
+
+            const fullText = `${diseasedisc} :   ${solutionText}.   ${pesticideList} ${pesticides}.   ${fertilizerList} ${fertilizers}.`;
+
+            // Making the API call with the selected language
+            fetch('/text_to_speech', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: fullText, language: selectedLanguage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.audio_url) {
+                    const audio = new Audio(data.audio_url);
+                    audio.play();
+                } else {
+                    alert('Text-to-Speech conversion failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
+        const diseaseSolutions = {
+            "Example Disease": {
+                solution: "This is a sample solution for the disease. It includes detailed steps and recommendations for treatment.",
+                pesticides: ["Pesticide A", "Pesticide B", "Pesticide C"],
+                fertilizers: ["Fertilizer X", "Fertilizer Y", "Fertilizer Z"]
             }
-            reader.readAsDataURL(file);
-        } else {
-            imagePreview.style.display = 'none';
+        };
+
+        function downloadSolution(diseaseName) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Get solution info
+            const solutionInfo = diseaseSolutions[diseaseName] || {};
+            const solution = solutionInfo.solution || "No solution available.";
+            const pesticides = solutionInfo.pesticides || [];
+            const fertilizers = solutionInfo.fertilizers || [];
+
+            // Set font
+            pdf.setFont("helvetica");
+            pdf.setFontSize(16);
+
+            // Add title
+            pdf.text(`Solution for ${diseaseName}`, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
+            // Reset font size for content
+            pdf.setFontSize(12);
+
+            // Add solution text with word wrap
+            const splitSolution = pdf.splitTextToSize(`Solution: ${solution}`, 180);
+            pdf.text(splitSolution, 15, 40);
+
+            // Add pesticides
+            let yPosition = 40 + (splitSolution.length * 7);
+
+            pdf.text("Recommended Pesticides:", 15, yPosition);
+            yPosition += 10;
+
+            pesticides.forEach(pesticide => {
+                pdf.text(`- ${pesticide}`, 15, yPosition);
+                yPosition += 7;
+            });
+
+            // Add fertilizers
+            yPosition += 5;
+            pdf.text("Recommended Fertilizers:", 15, yPosition);
+            yPosition += 10;
+
+            fertilizers.forEach(fertilizer => {
+                pdf.text(`- ${fertilizer}`, 15, yPosition);
+                yPosition += 7;
+            });
+
+            // Download the PDF
+            pdf.save(`${diseaseName.replace(/\s+/g, '_')}.pdf`);
         }
-    }
-    function viewSolution() {
-        const disease = sessionStorage.getItem('disease');
-        if (disease) {
-            window.location.href = `/solution/${disease}`;
-        }
-    }
         if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
-            .then(() => console.log("Service Worker registered"))
-            .catch(error => console.log("Service Worker registration failed:", error));
-    }
+            navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+                .then(() => console.log("Service Worker registered"))
+                .catch(error => console.log("Service Worker registration failed:", error));
+        }
     </script>
 </body>
 </html>
