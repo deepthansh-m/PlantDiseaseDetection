@@ -82,7 +82,6 @@
 
             const fullText = `${diseasedisc} :   ${solutionText}.   ${pesticideList} ${pesticides}.   ${fertilizerList} ${fertilizers}.`;
 
-            // Making the API call with the selected language
             fetch('/text_to_speech', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -113,27 +112,21 @@
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
 
-            // Get solution info
             const solutionInfo = diseaseSolutions[diseaseName] || {};
             const solution = solutionInfo.solution || "No solution available.";
             const pesticides = solutionInfo.pesticides || [];
             const fertilizers = solutionInfo.fertilizers || [];
 
-            // Set font
             pdf.setFont("helvetica");
             pdf.setFontSize(16);
 
-            // Add title
             pdf.text(`Solution for ${diseaseName}`, pdf.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-            // Reset font size for content
             pdf.setFontSize(12);
 
-            // Add solution text with word wrap
             const splitSolution = pdf.splitTextToSize(`Solution: ${solution}`, 180);
             pdf.text(splitSolution, 15, 40);
 
-            // Add pesticides
             let yPosition = 40 + (splitSolution.length * 7);
 
             pdf.text("Recommended Pesticides:", 15, yPosition);
@@ -144,7 +137,6 @@
                 yPosition += 7;
             });
 
-            // Add fertilizers
             yPosition += 5;
             pdf.text("Recommended Fertilizers:", 15, yPosition);
             yPosition += 10;
@@ -154,7 +146,6 @@
                 yPosition += 7;
             });
 
-            // Download the PDF
             pdf.save(`${diseaseName.replace(/\s+/g, '_')}.pdf`);
         }
         if ('serviceWorker' in navigator) {

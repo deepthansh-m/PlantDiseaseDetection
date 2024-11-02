@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4565b068-7f84-4a93-a85c-c77ed5529cf1" name="Changes" comment="added styling">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/static/audio/output.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/solution.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/solution.html" afterDir="false" />
-    </list>
+    <list default="true" id="4565b068-7f84-4a93-a85c-c77ed5529cf1" name="Changes" comment="upgraded model performance" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,18 +31,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "deepthansh-m"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;deepthansh-m&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/deepthansh-m/PlantDiseaseDetection.git",
-    "accountId": "60147589-797a-40c8-b841-3da7cae664a2"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/deepthansh-m/PlantDiseaseDetection.git&quot;,
+    &quot;accountId&quot;: &quot;60147589-797a-40c8-b841-3da7cae664a2&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -110,7 +103,7 @@
       <updated>1730471421181</updated>
       <workItem from="1730471427104" duration="969000" />
       <workItem from="1730472675714" duration="939000" />
-      <workItem from="1730474216769" duration="18861000" />
+      <workItem from="1730474216769" duration="23477000" />
     </task>
     <task id="LOCAL-00001" summary="initial">
       <option name="closed" value="true" />
@@ -136,7 +129,23 @@
       <option name="project" value="LOCAL" />
       <updated>1730518268407</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="better text to speech">
+      <option name="closed" value="true" />
+      <created>1730525821895</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1730525821895</updated>
+    </task>
+    <task id="LOCAL-00005" summary="upgraded model performance">
+      <option name="closed" value="true" />
+      <created>1730551892086</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1730551892086</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -146,7 +155,9 @@
     <MESSAGE value="initial" />
     <MESSAGE value="added solution page" />
     <MESSAGE value="added styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="added styling" />
+    <MESSAGE value="better text to speech" />
+    <MESSAGE value="upgraded model performance" />
+    <option name="LAST_COMMIT_MESSAGE" value="upgraded model performance" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PlantDiseaseDetection$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1730473250188" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
