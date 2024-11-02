@@ -34,20 +34,27 @@ function translateText() {
     const translatableElements = document.querySelectorAll('.translatable');
     const lang = document.getElementById('languageSelect').value;
 
-    // Collect the text to translate after defining the array
-    const textArray = Array.from(translatableElements).map(element => element.innerText);
+    const textArray = Array.from(translatableElements).map(element => element.innerText.trim());
+
+    const indicesToTranslate = textArray.map((text, index) => text !== '' ? index : null).filter(index => index !== null);
+
     console.log("Translating text:", textArray, "to language:", lang);
+
+    if (indicesToTranslate.length === 0) {
+        console.warn('No text available for translation.');
+        return;
+    }
 
     fetch('/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: textArray, lang })
+        body: JSON.stringify({ text: textArray.filter(text => text !== ''), lang })
     })
     .then(response => response.json())
     .then(data => {
-        if (data.translated_texts && data.translated_texts.length === textArray.length) {
-            translatableElements.forEach((element, index) => {
-                element.innerText = data.translated_texts[index];
+        if (data.translated_texts && data.translated_texts.length === indicesToTranslate.length) {
+            indicesToTranslate.forEach((originalIndex, translatedIndex) => {
+                translatableElements[originalIndex].innerText = data.translated_texts[translatedIndex] || ''; // Maintain null/empty where applicable
             });
         } else {
             console.error('Translation response error:', data);
