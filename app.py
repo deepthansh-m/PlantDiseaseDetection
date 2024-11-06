@@ -8,8 +8,13 @@ from flask import Flask, send_file
 from fpdf import FPDF
 from langcodes import Language
 import os
+import logging
+import traceback
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 model = tf.keras.models.load_model('model/plant_disease_model.h5')
 disease_classes = [
@@ -61,26 +66,62 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    file = request.files['file']
-    if file:
-        img = Image.open(file).resize((64, 64))
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+    try:
+        # Check if file exists in request
+        if 'file' not in request.files:
+            logger.error("No file part in request")
+            return jsonify({'error': 'No file part'})
 
-        predictions = model.predict(img_array)
-        predicted_class = np.argmax(predictions[0])
-        confidence = predictions[0][predicted_class]
+        file = request.files['file']
 
-        disease_name = disease_classes[predicted_class]
+        if file.filename == '':
+            logger.error("No file selected")
+            return jsonify({'error': 'No file selected'})
 
-        solution_url = url_for('solution', disease_name=disease_name)
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+        if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
+            logger.error(f"Invalid file type: {file.filename}")
+            return jsonify({'error': 'Invalid file type. Please upload an image file (png, jpg, jpeg, gif)'})
 
-        return jsonify({
-            'disease': disease_name,
-            'confidence': f"{confidence:.2f}",
-            'solution_url': solution_url
-        })
-    return jsonify({'error': 'No file uploaded'})
+        temp_dir = 'temp_uploads'
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+
+        temp_path = os.path.join(temp_dir, file.filename)
+        file.save(temp_path)
+
+        try:
+            img = Image.open(temp_path)
+            img = img.convert('RGB')
+            img = img.resize((64, 64))
+            img_array = np.array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
+
+            predictions = model.predict(img_array)
+            predicted_class = np.argmax(predictions[0])
+            confidence = float(predictions[0][predicted_class])  # Convert to float for JSON serialization
+            disease_name = disease_classes[predicted_class]
+
+            os.remove(temp_path)
+
+            solution_url = url_for('solution', disease_name=disease_name)
+
+            logger.info(f"Successfully predicted disease: {disease_name} with confidence: {confidence}")
+            return jsonify({
+                'disease': disease_name,
+                'confidence': f"{confidence:.2f}",
+                'solution_url': solution_url
+            })
+
+        except Exception as e:
+            logger.error(f"Error processing image: {str(e)}\n{traceback.format_exc()}")
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return jsonify({'error': f'Error processing image: {str(e)}'})
+
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({'error': f'Unexpected error: {str(e)}'})
 
 disease_solutions = {
     "Apple Apple scab": {
