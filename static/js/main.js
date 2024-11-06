@@ -3,22 +3,41 @@ function predictDisease() {
     const resultElement = document.getElementById('predictionResult');
     const solutionButton = document.getElementById('solutionButton');
 
+    // Reset previous results
+    resultElement.innerText = '';
+    solutionButton.style.display = 'none';
+
+    // Validate file input
     if (!fileInput.files || !fileInput.files[0]) {
         resultElement.innerText = 'Please select an image file first';
-        solutionButton.style.display = 'none';
         return;
     }
 
     const file = fileInput.files[0];
+
+    // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!validTypes.includes(file.type)) {
         resultElement.innerText = 'Please select a valid image file (JPG, PNG, or GIF)';
-        solutionButton.style.display = 'none';
         return;
     }
 
+    // Validate file size
+    const maxSize = 16 * 1024 * 1024; // 16MB
+    if (file.size > maxSize) {
+        resultElement.innerText = 'File size too large. Please select an image under 16MB.';
+        return;
+    }
+
+    // Show loading state
     resultElement.innerText = 'Analyzing image...';
-    solutionButton.style.display = 'none';
+    const loadingDots = setInterval(() => {
+        if (resultElement.innerText.endsWith('...')) {
+            resultElement.innerText = 'Analyzing image';
+        } else {
+            resultElement.innerText += '.';
+        }
+    }, 500);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -28,8 +47,12 @@ function predictDisease() {
         body: formData
     })
     .then(response => {
+        clearInterval(loadingDots);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json().then(data => {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            });
         }
         return response.json();
     })
@@ -49,8 +72,16 @@ function predictDisease() {
     })
     .catch(error => {
         console.error('Error:', error);
-        resultElement.innerText = 'Error: ' + error.message;
-        solutionButton.style.display = 'none';
+        resultElement.innerText = `Error: ${error.message}`;
+        // Add debugging information
+        console.log('File details:', {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+    })
+    .finally(() => {
+        clearInterval(loadingDots);
     });
 }
 
