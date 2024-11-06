@@ -9,6 +9,7 @@ from fpdf import FPDF
 from langcodes import Language
 import os
 from werkzeug.utils import secure_filename
+import uuid
 
 app = Flask(__name__)
 
@@ -81,7 +82,11 @@ def predict():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        unique_filename = str(uuid.uuid4()) + os.path.splitext(filename)[1]
+
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+
         file.save(filepath)
 
         img = Image.open(filepath).resize((64, 64))
@@ -93,8 +98,8 @@ def predict():
 
         disease_name = disease_classes[predicted_class]
 
-        # Send prediction results
-        return jsonify({'disease': disease_name, 'confidence': str(predictions[0][predicted_class])})
+        return jsonify(
+            {'disease': disease_name, 'confidence': str(predictions[0][predicted_class]), 'filename': unique_filename})
 
     return jsonify({'error': 'File type not allowed'})
 
