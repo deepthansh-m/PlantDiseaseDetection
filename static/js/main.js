@@ -1,7 +1,15 @@
 function predictDisease() {
     const fileInput = document.getElementById('imageUpload');
+
+    if (!fileInput.files.length) {
+        alert("No file selected.");
+        return;
+    }
+
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
+
+    console.log("Uploading file:", fileInput.files[0]);
 
     fetch('/predict', {
         method: 'POST',
@@ -14,7 +22,6 @@ function predictDisease() {
 
         if (data.disease) {
             resultElement.innerText = `Disease: ${data.disease} (Confidence: ${data.confidence}%)`;
-
             solutionButton.style.display = 'inline-block';
             solutionButton.onclick = function() {
                 window.location.href = data.solution_url;
