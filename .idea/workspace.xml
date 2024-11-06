@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4565b068-7f84-4a93-a85c-c77ed5529cf1" name="Changes" comment="upgraded performance" />
+    <list default="true" id="4565b068-7f84-4a93-a85c-c77ed5529cf1" name="Changes" comment="server error">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,7 +110,7 @@
       <workItem from="1730812414867" duration="7943000" />
       <workItem from="1730821186211" duration="10000" />
       <workItem from="1730822429073" duration="749000" />
-      <workItem from="1730893278702" duration="3618000" />
+      <workItem from="1730893278702" duration="4503000" />
     </task>
     <task id="LOCAL-00001" summary="initial">
       <option name="closed" value="true" />
@@ -173,7 +176,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730896900377</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="server error">
+      <option name="closed" value="true" />
+      <created>1730897352356</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1730897352356</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,7 +207,8 @@
     <MESSAGE value="added styling" />
     <MESSAGE value="upgraded model performance" />
     <MESSAGE value="upgraded performance" />
-    <option name="LAST_COMMIT_MESSAGE" value="upgraded performance" />
+    <MESSAGE value="server error" />
+    <option name="LAST_COMMIT_MESSAGE" value="server error" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PlantDiseaseDetection$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1730473250188" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
