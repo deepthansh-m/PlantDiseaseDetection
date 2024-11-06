@@ -1,87 +1,32 @@
 function predictDisease() {
     const fileInput = document.getElementById('imageUpload');
-    const resultElement = document.getElementById('predictionResult');
-    const solutionButton = document.getElementById('solutionButton');
-
-    // Reset previous results
-    resultElement.innerText = '';
-    solutionButton.style.display = 'none';
-
-    // Validate file input
-    if (!fileInput.files || !fileInput.files[0]) {
-        resultElement.innerText = 'Please select an image file first';
-        return;
-    }
-
-    const file = fileInput.files[0];
-
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
-        resultElement.innerText = 'Please select a valid image file (JPG, PNG, or GIF)';
-        return;
-    }
-
-    // Validate file size
-    const maxSize = 16 * 1024 * 1024; // 16MB
-    if (file.size > maxSize) {
-        resultElement.innerText = 'File size too large. Please select an image under 16MB.';
-        return;
-    }
-
-    // Show loading state
-    resultElement.innerText = 'Analyzing image...';
-    const loadingDots = setInterval(() => {
-        if (resultElement.innerText.endsWith('...')) {
-            resultElement.innerText = 'Analyzing image';
-        } else {
-            resultElement.innerText += '.';
-        }
-    }, 500);
-
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', fileInput.files[0]);
 
     fetch('/predict', {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        clearInterval(loadingDots);
-
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
-            });
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        if (data.error) {
-            throw new Error(data.error);
-        }
+        const resultElement = document.getElementById('predictionResult');
+        const solutionButton = document.getElementById('solutionButton');
 
         if (data.disease) {
             resultElement.innerText = `Disease: ${data.disease} (Confidence: ${data.confidence}%)`;
-            sessionStorage.setItem('disease', data.disease);
+
             solutionButton.style.display = 'inline-block';
             solutionButton.onclick = function() {
                 window.location.href = data.solution_url;
             };
+        } else {
+            resultElement.innerText = 'Error: ' + data.error;
+            solutionButton.style.display = 'none';
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        resultElement.innerText = `Error: ${error.message}`;
-        // Add debugging information
-        console.log('File details:', {
-            name: file.name,
-            type: file.type,
-            size: file.size
-        });
-    })
-    .finally(() => {
-        clearInterval(loadingDots);
+        document.getElementById('predictionResult').innerText = 'Error: ' + error.message;
+        document.getElementById('solutionButton').style.display = 'none';
     });
 }
 

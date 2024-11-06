@@ -8,48 +8,8 @@ from flask import Flask, send_file
 from fpdf import FPDF
 from langcodes import Language
 import os
-import logging
-import sys
-import traceback
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s: %(message)s',
-    handlers=[
-        logging.FileHandler('app.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger(__name__)
-
-app = Flask(__name__)
-
-# Increase maximum content length
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-
-# Configure upload folder
-UPLOAD_FOLDER = 'temp_uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure the model is loaded correctly
-try:
-    model = tf.keras.models.load_model('model/plant_disease_model.h5')
-    logger.info("Model loaded successfully")
-except Exception as e:
-    logger.error(f"Error loading model: {str(e)}")
-    raise
-
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 model = tf.keras.models.load_model('model/plant_disease_model.h5')
 disease_classes = [
@@ -99,90 +59,28 @@ translator = Translator()
 def index():
     return render_template('index.html')
 
-
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        logger.debug("Received prediction request")
+    file = request.files['file']
+    if file:
+        img = Image.open(file).resize((64, 64))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
 
-        # Check if the post request has the file part
-        if 'file' not in request.files:
-            logger.error("No file part in request")
-            return jsonify({'error': 'No file part'}), 400
+        predictions = model.predict(img_array)
+        predicted_class = np.argmax(predictions[0])
+        confidence = predictions[0][predicted_class]
 
-        file = request.files['file']
+        disease_name = disease_classes[predicted_class]
 
-        # If user does not select file
-        if file.filename == '':
-            logger.error("No selected file")
-            return jsonify({'error': 'No selected file'}), 400
+        solution_url = url_for('solution', disease_name=disease_name)
 
-        # Log file details
-        logger.debug(f"Received file: {file.filename}, Content type: {file.content_type}")
-
-        if not allowed_file(file.filename):
-            logger.error(f"Invalid file type: {file.filename}")
-            return jsonify({'error': 'Invalid file type'}), 400
-
-        try:
-            # Secure the filename
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-            # Save the file
-            logger.debug(f"Saving file to {filepath}")
-            file.save(filepath)
-
-            # Open and process the image
-            logger.debug("Processing image")
-            with Image.open(filepath) as img:
-                img = img.convert('RGB')
-                img = img.resize((64, 64))
-                img_array = np.array(img) / 255.0
-                img_array = np.expand_dims(img_array, axis=0)
-
-            # Make prediction
-            logger.debug("Making prediction")
-            predictions = model.predict(img_array)
-            predicted_class = np.argmax(predictions[0])
-            confidence = float(predictions[0][predicted_class])
-            disease_name = disease_classes[predicted_class]
-
-            # Clean up
-            logger.debug("Cleaning up temporary file")
-            if os.path.exists(filepath):
-                os.remove(filepath)
-
-            solution_url = url_for('solution', disease_name=disease_name)
-
-            logger.info(f"Successfully predicted disease: {disease_name}")
-            return jsonify({
-                'disease': disease_name,
-                'confidence': f"{confidence:.2f}",
-                'solution_url': solution_url
-            }), 200
-
-        except Exception as e:
-            logger.error(f"Error processing image: {str(e)}\n{traceback.format_exc()}")
-            if os.path.exists(filepath):
-                os.remove(filepath)
-            return jsonify({'error': f'Error processing image: {str(e)}'}), 500
-
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}\n{traceback.format_exc()}")
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
-
-
-@app.errorhandler(500)
-def internal_error(error):
-    logger.error(f"500 error: {str(error)}\n{traceback.format_exc()}")
-    return jsonify({'error': 'Internal server error. Please check the logs for details.'}), 500
-
-
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logger.error(f"Unhandled exception: {str(e)}\n{traceback.format_exc()}")
-    return jsonify({'error': 'An unexpected error occurred. Please check the logs for details.'}), 500
+        return jsonify({
+            'disease': disease_name,
+            'confidence': f"{confidence:.2f}",
+            'solution_url': solution_url
+        })
+    return jsonify({'error': 'No file uploaded'})
 
 disease_solutions = {
     "Apple Apple scab": {
@@ -451,11 +349,4 @@ def text_to_speech():
     return jsonify({'error': 'Invalid text'})
 
 if __name__ == '__main__':
-    try:
-        sample_input = np.zeros((1, 64, 64, 3))
-        _ = model.predict(sample_input)
-        logger.info("Model test prediction successful")
-    except Exception as e:
-        logger.error(f"Model test prediction failed: {str(e)}")
-        raise
     app.run(debug=True)
