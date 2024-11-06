@@ -8,19 +8,8 @@ from flask import Flask, send_file
 from fpdf import FPDF
 from langcodes import Language
 import os
-from werkzeug.utils import secure_filename
-import uuid
 
 app = Flask(__name__)
-
-UPLOAD_FOLDER = 'uploads/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 model = tf.keras.models.load_model('model/plant_disease_model.h5')
 disease_classes = [
@@ -70,38 +59,28 @@ translator = Translator()
 def index():
     return render_template('index.html')
 
-
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
-
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'})
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-
-        unique_filename = str(uuid.uuid4()) + os.path.splitext(filename)[1]
-
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-
-        file.save(filepath)
-
-        img = Image.open(filepath).resize((64, 64))
+    if file:
+        img = Image.open(file).resize((64, 64))
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
         predictions = model.predict(img_array)
         predicted_class = np.argmax(predictions[0])
+        confidence = predictions[0][predicted_class]
 
         disease_name = disease_classes[predicted_class]
 
-        return jsonify(
-            {'disease': disease_name, 'confidence': str(predictions[0][predicted_class]), 'filename': unique_filename})
+        solution_url = url_for('solution', disease_name=disease_name)
 
-    return jsonify({'error': 'File type not allowed'})
+        return jsonify({
+            'disease': disease_name,
+            'confidence': f"{confidence:.2f}",
+            'solution_url': solution_url
+        })
+    return jsonify({'error': 'No file uploaded'})
 
 disease_solutions = {
     "Apple Apple scab": {
